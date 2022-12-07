@@ -14,11 +14,26 @@ namespace PBD
         public:
             static int TYPE_ID;
             Real m_restLength;
+            Real m_stiffness;
 
             SkinningPointEdgeDistanceConstraint() : Constraint(2) {}
             virtual int &getTypeId() const { return TYPE_ID; }
 
             bool initConstraint(PositionBasedSkinningModel &model, const unsigned int particle1, const unsigned int particle2);
             virtual bool solvePositionConstraint(SimulationModel &model, const unsigned int iter);
+    };
+
+    class SkinningPointBindConstraint : public Constraint
+    {
+        public:
+            static int TYPE_ID;
+            Real m_rest_Length;
+            Real m_stiffness;
+
+            SkinningPointBindConstraint() : Constraint(2) {}
+            virtual int &getTypeId() const { return TYPE_ID; }
+
+            bool initConstraint(PositionBasedSkinningModel &model, const unsigned int particle1, const unsigned int particle2);
+            virtual bool solveBindConstraint(SimulationModel &model, const unsigned int iter);
     };
 }

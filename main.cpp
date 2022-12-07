@@ -185,6 +185,7 @@ void render ()
 	ParticleData &pd = model->getParticles();
     float pointColor[4] = { 0.1f, 0.2f, 0.6f, 1 };
     float triangleColor[4] = { 1.0f, 1.0f, 1.0f, 0.7f };
+    float edgeColor[4] = { 0.0f, 0.6f, 0.2f, 1 };
     for (unsigned int i=0; i<pd.size(); i++) {
         MiniGL::drawSphere(pd.getPosition(i), 0.1f, pointColor);
     }
@@ -192,8 +193,10 @@ void render ()
         Vector3r a = pd.getPosition(renderFaces[i][0]);
         Vector3r b = pd.getPosition(renderFaces[i][1]);
         Vector3r c = pd.getPosition(renderFaces[i][2]);
-        Vector3r norm = (b-a).cross(c-a);
+        Vector3r norm = (b-a).cross(c-b);
         MiniGL::drawTriangle(a, b, c, norm, triangleColor);
+        Vector3r center = (a + b + c) / 3.0;
+        MiniGL::drawVector(center, center + norm.normalized(), 0.2f, edgeColor);
     }
     MiniGL::drawTime( TimeManager::getCurrent ()->getTime ());
 }
