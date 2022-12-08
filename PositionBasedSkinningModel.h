@@ -14,11 +14,12 @@ namespace PBD
             PositionBasedSkinningModel();
             virtual ~PositionBasedSkinningModel();
 
-        protected:
-            ParticleData m_surfaceParticles;
+            ParticleData m_boneParticles;
             Vector3r m_stiffness;
+            std::vector<Matrix4d> m_joints; 
 
         public:
+            void updateBones(std::vector<Matrix4d> joints);
             void addVertice(const unsigned int nPoints, Vector3r *points);
             void addPointEdgeDistanceConstraint(const unsigned int pA, const unsigned int pB, const unsigned int pG);
 

@@ -189,6 +189,7 @@ void render ()
     for (unsigned int i=0; i<pd.size(); i++) {
         MiniGL::drawSphere(pd.getPosition(i), 0.1f, pointColor);
     }
+    // LOG_INFO << "123";
     for (unsigned int i=0; i<renderFaces.size(); i++) {
         Vector3r a = pd.getPosition(renderFaces[i][0]);
         Vector3r b = pd.getPosition(renderFaces[i][1]);
@@ -196,9 +197,9 @@ void render ()
         Vector3r norm = (b-a).cross(c-b);
         MiniGL::drawTriangle(a, b, c, norm, triangleColor);
         Vector3r center = (a + b + c) / 3.0;
-        MiniGL::drawVector(center, center + norm.normalized(), 0.2f, edgeColor);
+        MiniGL::drawVector(center, center + norm.normalized()*5, 2.0f, edgeColor);
     }
-    MiniGL::drawTime( TimeManager::getCurrent ()->getTime ());
+    MiniGL::drawTime(TimeManager::getCurrent()->getTime());
 }
 
 
@@ -208,7 +209,7 @@ void createCharacter()
 {
 	PositionBasedSkinningModel *model = (PositionBasedSkinningModel*) Simulation::getCurrent()->getModel();
     ParticleData &particles = model->getParticles();
-    string filename = "/home/czk119/Desktop/animation-retargeting-intersection/Kaya.off";
+    string filename = "/home/czk119/ws/PositionBasedDynamics/Demos/Skinning/data/Kaya.off";
     SimulationModel::ConstraintVector &constraints = model->getConstraints();
 
     // load off
