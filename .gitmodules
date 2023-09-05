@@ -1,0 +1,3 @@
+[submodule "extern/PositionBasedDynamics"]
+	path = extern/PositionBasedDynamics
+	url = https://github.com/InteractiveComputerGraphics/PositionBasedDynamics.git
