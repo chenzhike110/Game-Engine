@@ -129,6 +129,4 @@ dmypy.json
 .pyre/
 
 .vscode
-libs/
-extern/PositionBasedDyanmics
-
+bin
