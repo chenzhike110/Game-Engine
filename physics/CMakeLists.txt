@@ -1,11 +1,3 @@
-if (DEFINED PBD_EXTERNALINSTALLDIR)
-	set(ExternalInstallDir "${PBD_EXTERNALINSTALLDIR}" CACHE INTERNAL "External install directory")	
-else()
-	set(ExternalInstallDir "${PROJECT_BINARY_DIR}" CACHE INTERNAL "External install directory")	
-endif()	
-
-include(ExternalProject)
-
 find_package(Eigen3 REQUIRED)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -idirafter${EIGEN3_INCLUDE_DIR}")

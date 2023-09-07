@@ -7,9 +7,9 @@ set(PROJECT_PATH ${PROJECT_SOURCE_DIR})
 include(${PROJECT_PATH}/CMake/Common.cmake)
 include(${PROJECT_PATH}/CMake/DataCopyTargets.cmake)
 
-# find_package(Eigen3 REQUIRED)
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-# include_directories( ${EIGEN3_INCLUDE_DIR} )
+# external projects
+set(ExternalInstallDir "${PROJECT_BINARY_DIR}" CACHE INTERNAL "External install directory")	
+include(ExternalProject)
 
 #opengl
 set(OpenGL_GL_PREFERENCE GLVND)
@@ -36,22 +36,31 @@ file(GLOB VIS_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/extern/glfw/deps/glad_gl.c
 )
 
-# pbd
-set(PBDLIB ${PROJECT_SOURCE_DIR}/PBD)
-# set(GenericParameters_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/libs/GenericParameters/include)
-# set(Discregrid_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/libs/Discregrid/include)
-# set(DiscregridLIB ${PROJECT_SOURCE_DIR}/libs/Discregrid/lib)
-add_subdirectory(PBD)
+# pbd physics
+set(PBDLIB ${PROJECT_SOURCE_DIR}/physics)
+add_subdirectory(physics)
 
-add_executable(GamEngine main.cpp ${IMGUI_SRC} ${VIS_SOURCE_FILES})
+ExternalProject_Add(
+    Ext_assimp
+    PREFIX "${CMAKE_BINARY_DIR}/extern/Assimp"
+    GIT_REPOSITORY https://github.com/assimp/assimp.git
+    INSTALL_DIR ${ExternalInstallDir}/assimp
+    CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=${EXT_CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX:PATH=${ExternalInstallDir}/assimp
+    -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -DASSIMP_BUILD_TESTS=OFF
+) 
+ExternalProject_Get_Property(Ext_assimp INSTALL_DIR)
+set(Assimp_INCLUDE_DIR ${INSTALL_DIR}/include)
+set(Assimp_LIBRARIES optimized ${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}assimp${CMAKE_SHARED_LIBRARY_SUFFIX} 
+                     debug ${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}assimp_d${CMAKE_SHARED_LIBRARY_SUFFIX})
+unset(INSTALL_DIR)
+message(STATUS "Building ${assimp_INCLUDE_DIR}")
 
 include_directories(
-    # ${PROJECT_SOURCE_DIR}/libs/PositionBasedDynamics
-    # ${GenericParameters_INCLUDE_DIR}
-    # ${Discregrid_INCLUDE_DIR}
     ${PROJECT_SOURCE_DIR}
-    ${PROJECT_SOURCE_DIR}/PBD
+    ${PROJECT_SOURCE_DIR}/physics
 )
+
+add_executable(GamEngine main.cpp ${IMGUI_SRC} ${VIS_SOURCE_FILES})
 
 set(SIMULATION_LINK_LIBRARIES imgui glfw PositionBasedDynamics Simulation Utils)
 set(SIMULATION_DEPENDENCIES imgui glfw PositionBasedDynamics Simulation Utils CopyPBDShaders CopyImguiFonts CopyPBDModels)

@@ -1,13 +1,15 @@
-#include <Common/Common.h>
-#include "Utils/Timing.h"
+#include "physics/Common/Common.h"
+#include "physics/Utils/Timing.h"
 #include "visual/MiniGL.h"
 #include "visual/Widget.h"
 #include "visual/MeshUtils.h"
-#include "Utils/FileSystem.h"
-#include "Simulation/Simulation.h"
-#include "Simulation/TimeManager.h"
-#include "Simulation/SimulationModel.h"
-#include "Simulation/DistanceFieldCollisionDetection.h"
+#include "physics/Utils/FileSystem.h"
+#include "physics/Simulation/Simulation.h"
+#include "physics/Simulation/TimeManager.h"
+#include "physics/Simulation/SimulationModel.h"
+#include "physics/Simulation/DistanceFieldCollisionDetection.h"
+
+#include "animation/animation.h"
 
 using namespace PBD;
 using namespace Utilities;
@@ -21,37 +23,34 @@ void timeStep();
 void buildModel();
 
 int main(int argc, char **argv){
-
     Widget = new MeshWidget();
     Widget->init(argc, argv);
 
-    SimulationModel *model = new SimulationModel();
-	model->init();
-	Simulation::getCurrent()->setModel(model);
+    // SimulationModel *model = new SimulationModel();
+	// model->init();
+	// Simulation::getCurrent()->setModel(model);
 
-    cd = new DistanceFieldCollisionDetection();
-	cd->init();
+    // cd = new DistanceFieldCollisionDetection();
+	// cd->init();
 
-    buildModel();
+    // buildModel();
 
-    MiniGL::setClientIdleFunc(timeStep);	
+    // MiniGL::setClientIdleFunc(timeStep);	
     MiniGL::setClientSceneFunc(render);		
-    MiniGL::setViewport(40.0, 0.1f, 500.0, Vector3r(0.0, 3.0, 8.0), Vector3r(0.0, 0.0, 0.0));
+    MiniGL::setViewport (40.0f, 0.1f, 500.0, Vector3r (5.0, 30.0, 70.0), Vector3r (5.0, 0.0, 0.0));
     MiniGL::mainLoop();
 
-    delete Simulation::getCurrent();
+    // delete Simulation::getCurrent();
 	delete Widget;
-	delete model;
-	delete cd;
+	// delete model;
+	// delete cd;
 
     return 0;
 }
 
-void render(){
-    // Vector3r center = {0.0, 0.0, 0.0};
-    // float m_jointColor[4] = { 0.0f, 0.6f, 0.2f, 1 };
+void loadFBX();
 
-    // MiniGL::drawSphere(center, 0.08f, m_jointColor);
+void render(){
     Widget->render();
 }
 
@@ -100,17 +99,9 @@ void buildModel(){
 
     // add ball
     rb[rbIndex] = new RigidBody();
-
-    Real ax = static_cast <Real> (rand()) / static_cast <Real> (RAND_MAX);
-    Real ay = static_cast <Real> (rand()) / static_cast <Real> (RAND_MAX);
-    Real az = static_cast <Real> (rand()) / static_cast <Real> (RAND_MAX);
-    Real w = static_cast <Real> (rand()) / static_cast <Real> (RAND_MAX);
-    Quaternionr q(w, ax, ay, az);
-    q.normalize();
-
     rb[rbIndex]->initBody(100.0,
         Vector3r(-0.5, 14.0, -0.5),
-        q, //Quaternionr(1.0, 0.0, 0.0, 0.0),
+        Quaternionr(1.0, 0.0, 0.0, 0.0),
         vdSphere, meshSphere);
 
     const std::vector<Vector3r> &vertices_b = rb[rbIndex]->getGeometry().getVertexDataLocal().getVertices();

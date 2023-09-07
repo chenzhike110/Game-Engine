@@ -1,10 +1,10 @@
 #ifndef MESH_UTILS_H
 #define MESH_UTILS_H
 
-#include <Utils/OBJLoader.h>
-#include <Utils/PLYLoader.h>
-#include <Utils/IndexedFaceMesh.h>
-#include <Simulation/ParticleData.h>
+#include <physics/Utils/OBJLoader.h>
+#include <physics/Utils/PLYLoader.h>
+#include <physics/Utils/IndexedFaceMesh.h>
+#include <physics/Simulation/ParticleData.h>
 
 using namespace Utilities;
 using namespace PBD;

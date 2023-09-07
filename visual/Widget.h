@@ -16,6 +16,8 @@ class MeshWidget
         void render();
         void renderRigidBodys();
 
+        void mainLoop();
+
         void initShaders();
         void shaderBegin(const float *col);
 		void shaderEnd();

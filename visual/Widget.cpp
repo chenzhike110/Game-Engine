@@ -14,13 +14,25 @@
 #include "Simulation/Simulation.h"
 #include "Simulation/SimulationModel.h"
 
+// namespace{
+// typedef void (*ImGuiDemoMarkerCallback)(const char* file, int line, const char* section, void* user_data);
+// extern ImGuiDemoMarkerCallback      GImGuiDemoMarkerCallback;
+// extern void*                        GImGuiDemoMarkerCallbackUserData;
+// ImGuiDemoMarkerCallback             GImGuiDemoMarkerCallback = NULL;
+// void*                               GImGuiDemoMarkerCallbackUserData = NULL;
+// }
+// #define IMGUI_DEMO_MARKER(section)  do { if (GImGuiDemoMarkerCallback != NULL) GImGuiDemoMarkerCallback(__FILE__, __LINE__, section, GImGuiDemoMarkerCallbackUserData); } while (0)
+
 INIT_LOGGING
 INIT_TIMING
 
 using namespace PBD;
 using namespace Utilities;
 
-MeshWidget::MeshWidget(){}
+MeshWidget::MeshWidget(){
+	logger.addSink(std::unique_ptr<ConsoleSink>(new ConsoleSink(LogLevel::INFO)));
+	logger.addSink(std::shared_ptr<BufferSink>(new BufferSink(LogLevel::DEBUG)));
+}
 
 void MeshWidget::initShaders()
 {
@@ -69,6 +81,8 @@ void MeshWidget::initShaders()
 
 void MeshWidget::init(int argc, char **argv)
 {
+	m_exePath = FileSystem::getProgramPath();
+
     IMGUI_CHECKVERSION();
     ImGuiContext* m_context = ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); 
@@ -82,33 +96,14 @@ void MeshWidget::init(int argc, char **argv)
 	MiniGL::addCharFunc([](int key, int action) -> bool { ImGui_ImplGlfw_CharCallback(MiniGL::getWindow(), key); return ImGui::GetIO().WantCaptureKeyboard; });
 	MiniGL::addMousePressFunc([](int button, int action, int mods) -> bool { ImGui_ImplGlfw_MouseButtonCallback(MiniGL::getWindow(), button, action, mods); return ImGui::GetIO().WantCaptureMouse; });
 	MiniGL::addMouseWheelFunc([](int pos, double xoffset, double yoffset) -> bool { ImGui_ImplGlfw_ScrollCallback(MiniGL::getWindow(), xoffset, yoffset); return ImGui::GetIO().WantCaptureMouse; });
-
-	// apply user settings from ini file 
-
-	// ImGuiIO& io = ImGui::GetIO(); (void)io;
-	
-	// std::string font = Utilities::FileSystem::normalizePath(m_base->getExePath() + "/resources/fonts/Roboto-Medium.ttf");
-	// std::string font2 = Utilities::FileSystem::normalizePath(m_base->getExePath() + "/resources/fonts/Cousine-Regular.ttf");
-
-	// m_scales.push_back(1.0f);
-	// m_scales.push_back(1.25f);
-	// m_scales.push_back(1.5f);
-	// m_scales.push_back(1.75f);
-	// m_scales.push_back(2.0f);
-
-	// for(int i=0; i < 5; i++)
-	// 	m_fonts.push_back(io.Fonts->AddFontFromFileTTF(font.c_str(), m_baseSize * m_scales[i]));
-	// for (int i = 0; i < 5; i++)
-	// 	m_fonts2.push_back(io.Fonts->AddFontFromFileTTF(font2.c_str(), m_baseSize * m_scales[i]));
-
-	// initStyle();
 	if (MiniGL::checkOpenGLVersion(3, 3))
-		m_exePath = FileSystem::getProgramPath();
+		initShaders();
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(MiniGL::getWindow(), false);
 	const char* glsl_version = "#version 330";
 	ImGui_ImplOpenGL3_Init(glsl_version);
+	// MiniGL::setClientSceneFunc([=]{render();});	
     
 }
 
@@ -158,7 +153,7 @@ void MeshWidget::renderRigidBodys()
 	SimulationModel::RigidBodyVector &rb = model->getRigidBodies();
 
 	float surfaceColor[4] = { 0.1f, 0.4f, 0.7f, 1 };
-	float staticColor[4] = { 0.5f, 0.5f, 0.5f, 0.5 };
+	float staticColor[4] = { 0.5f, 0.5f, 0.5f, 1 };
 
 	for (size_t i = 0; i < rb.size(); i++)
 	{
@@ -203,7 +198,7 @@ void MeshWidget::render()
 	}
 	renderRigidBodys();
 	update();
-
+	
 }
 
 void MeshWidget::update()
@@ -221,6 +216,8 @@ void MeshWidget::update()
 	// add enough space for the menubar
 	ImVec2 pos = viewport->Pos;
 	ImVec2 size = viewport->Size;
+	size.y -= 15.0f;
+	pos.y += 15.0f;
 
 	ImGui::SetNextWindowPos(pos);
 	ImGui::SetNextWindowSize(size);
@@ -229,14 +226,43 @@ void MeshWidget::update()
 	windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 	if (dockspaceFlags & ImGuiDockNodeFlags_PassthruCentralNode) 
 		windowFlags |= ImGuiWindowFlags_NoBackground;
+	
+	ImGui::Begin("DockSpace", nullptr, windowFlags);
+	ImGuiID dockspaceID = ImGui::GetID("DockSpace");
+	ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
+	static int first = true;
+	if (first)
+	{
+		first = false;
+		ImGui::DockBuilderRemoveNode(dockspaceID);
+		ImGui::DockBuilderAddNode(dockspaceID, dockspaceFlags | ImGuiDockNodeFlags_DockSpace);
+		ImGui::DockBuilderSetNodeSize(dockspaceID, viewport->Size);
 
-	// ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	// ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-	// ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		auto dock_id_down = ImGui::DockBuilderSplitNode(dockspaceID, ImGuiDir_Down, 0.3f, nullptr, &dockspaceID);
+		auto dock_id_left = ImGui::DockBuilderSplitNode(dockspaceID, ImGuiDir_Left, 0.3f, nullptr, &dockspaceID);
+		ImGui::DockBuilderDockWindow("Settings", dock_id_left);
+		ImGui::DockBuilderDockWindow("Log", dock_id_down);
 
-	// ImGui::PopStyleVar(3);
+		ImGui::DockBuilderFinish(dockspaceID);
+	}
+	ImGui::End();
 
-	// ImGui::PopFont();
+	if (ImGui::BeginMainMenuBar()) 
+	{
+		if (ImGui::BeginMenu("File")) 
+		{
+			if (ImGui::MenuItem("Create")) { 
+			}
+			if (ImGui::MenuItem("Open", "Ctrl+O")) { 
+			}
+			if (ImGui::MenuItem("Save", "Ctrl+S")) {
+			}
+			if (ImGui::MenuItem("Save as..")) { 
+			}
+		ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
 
 	// Rendering
 	ImGui::Render();
