@@ -14,22 +14,25 @@
 using namespace PBD;
 using namespace Utilities;
 
-namespace {
+namespace 
+{
     MeshWidget* Widget;
     DistanceFieldCollisionDetection *cd;
 }
 void render();
 void timeStep();
+void loadModel();
 void buildModel();
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
     Widget = new MeshWidget();
     Widget->init(argc, argv);
-
-    // SimulationModel *model = new SimulationModel();
-	// model->init();
-	// Simulation::getCurrent()->setModel(model);
-
+    
+    SimulationModel *model = new SimulationModel();
+	model->init();
+	Simulation::getCurrent()->setModel(model);
+    loadModel();
     // cd = new DistanceFieldCollisionDetection();
 	// cd->init();
 
@@ -37,7 +40,7 @@ int main(int argc, char **argv){
 
     // MiniGL::setClientIdleFunc(timeStep);	
     MiniGL::setClientSceneFunc(render);		
-    MiniGL::setViewport(40.0f, 0.1f, 500.0, Vector3r (5.0, 30.0, 70.0), Vector3r (5.0, 0.0, 0.0));
+    MiniGL::setViewport(40.0f, 0.1f, 500.0, Vector3r(5.0, 30.0, 70.0), Vector3r (5.0, 0.0, 0.0));
     MiniGL::mainLoop();
 
     // delete Simulation::getCurrent();
@@ -48,18 +51,26 @@ int main(int argc, char **argv){
     return 0;
 }
 
-void loadFBX();
+void loadModel()
+{
+    const std::string filename = "/home/czk119/Desktop/MotionBERT/Kaya_Agreeing.bvh";
+    ANIM::Animation anim;
+    anim.loadBVH(filename);
+}
 
-void render(){
+void render()
+{
     Widget->render();
 }
 
-void timeStep(){
+void timeStep()
+{
     SimulationModel *model = Simulation::getCurrent()->getModel();
     Simulation::getCurrent()->getTimeStep()->step(*model);
 }
 
-void buildModel(){
+void buildModel()
+{
     // set time step
     TimeManager::getCurrent ()->setTimeStepSize (static_cast<Real>(0.005));
 

@@ -1,6 +1,7 @@
 #ifndef MESH_UTILS_H
 #define MESH_UTILS_H
 
+#include <visual/MiniGL.h>
 #include <physics/Utils/OBJLoader.h>
 #include <physics/Utils/PLYLoader.h>
 #include <physics/Utils/IndexedFaceMesh.h>

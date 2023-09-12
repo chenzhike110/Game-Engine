@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ASSIMP_BUILD_NO_BVH_IMPORTER
 
-#include "animation/bvh/BVHLoader.h"
+#include "animation/BVHLoader.h"
 #include <assimp/SkeletonMeshBuilder.h>
 #include <assimp/TinyFormatter.h>
 #include <assimp/fast_atof.h>
