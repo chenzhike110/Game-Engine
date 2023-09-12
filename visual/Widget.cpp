@@ -216,8 +216,8 @@ void MeshWidget::update()
 	// add enough space for the menubar
 	ImVec2 pos = viewport->Pos;
 	ImVec2 size = viewport->Size;
-	size.y -= 15.0f;
-	pos.y += 15.0f;
+	// size.y -= 15.0f;
+	// pos.y += 15.0f;
 
 	ImGui::SetNextWindowPos(pos);
 	ImGui::SetNextWindowSize(size);

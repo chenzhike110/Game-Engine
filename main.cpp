@@ -37,7 +37,7 @@ int main(int argc, char **argv){
 
     // MiniGL::setClientIdleFunc(timeStep);	
     MiniGL::setClientSceneFunc(render);		
-    MiniGL::setViewport (40.0f, 0.1f, 500.0, Vector3r (5.0, 30.0, 70.0), Vector3r (5.0, 0.0, 0.0));
+    MiniGL::setViewport(40.0f, 0.1f, 500.0, Vector3r (5.0, 30.0, 70.0), Vector3r (5.0, 0.0, 0.0));
     MiniGL::mainLoop();
 
     // delete Simulation::getCurrent();
