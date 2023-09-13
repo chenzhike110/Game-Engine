@@ -9,7 +9,6 @@
 
 using namespace PBD;
 
-
 namespace ANIM
 {
 
@@ -23,12 +22,13 @@ public:
 private:
 
     std::vector<Eigen::Vector3d> _rootPos;
-    std::vector<Eigen::MatrixXd> _jointAngle;
-    std::vector<std::string> _jointName;
-    std::map<std::string, Eigen::Vector3d> _tPos; //key for ${parent}_${children}
+    std::map<std::string, Eigen::Vector3i> _constraint;
+    std::map<std::string, std::string> _jointParent;
+    std::map<std::string, std::vector<Eigen::Vector3d>> _jointAngle;
+    std::map<std::string, Eigen::Vector3d> _tPos;
+    std::map<std::string, int> _rbIndex;
     std::string _rootName;
     // Assimp::BVHLoader* _bvhloader;
-
     Utilities::IndexedFaceMesh meshBox;
 	PBD::VertexData vdBox;
     // SimulationModel::RigidBodyVector m_rigidBodies;
